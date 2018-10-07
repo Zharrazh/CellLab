@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CellLab"
         mc:Ignorable="d"
-        Title="CellLab" Height="450" Width="800" ResizeMode="NoResize" Closed="Window_Closed" SizeToContent="WidthAndHeight">
+        Title="CellLab" Height="450" Width="800" Closed="Window_Closed" WindowStartupLocation="CenterScreen" WindowState="Maximized">
     <Grid Background="WhiteSmoke">
         <DockPanel>
             <StackPanel DockPanel.Dock="Right" Orientation="Vertical">
@@ -15,11 +15,13 @@
                 <Button Content="Stop" Margin="10" Width="50" Height="50" Name="StapBtn"/>
                 <Button Content="Settings" Margin="10" Width="50" Height="50" Click="SettingButton_Click" />
             </StackPanel>
-            <Slider Orientation="Horizontal" Width="100" Height="20" Minimum="15" Maximum="100" TickFrequency="1" IsSnapToTickEnabled="True" DockPanel.Dock="Top" Margin="30,10,5,10" HorizontalAlignment="Left" x:Name="SizeSlider" Value="20" ValueChanged="SizeSlider_ValueChanged"/>
-            <Border  BorderThickness="5" CornerRadius="5" BorderBrush="#FF95B4B4" Panel.ZIndex="1">
-                <Canvas DockPanel.Dock="Left" Name="Field"   Background="White"  >
-                </Canvas>
-            </Border>
+            <Slider Orientation="Horizontal" Width="100" Height="20" Minimum="15" Maximum="100" TickFrequency="1" IsSnapToTickEnabled="True" DockPanel.Dock="Bottom" Margin="30,10,5,10" HorizontalAlignment="Left" x:Name="SizeSlider" Value="20" ValueChanged="SizeSlider_ValueChanged"/>
+            <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+                <Border  BorderThickness="5" CornerRadius="5" BorderBrush="#FF95B4B4" Panel.ZIndex="1" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <Canvas DockPanel.Dock="Left" Name="Field"   Background="White"  >
+                    </Canvas>
+                </Border>
+            </ScrollViewer>
         </DockPanel>
 
     </Grid>
