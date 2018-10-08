@@ -16,8 +16,8 @@ namespace CellLab
         static public int POISONS, FOODS, RADIATION, FOODNUTRIATION, MAP, SIZE, ROWS, COLUMNS;
         public static int NowPoison = 0, NowFood = 0;
         static bool[,] walls;
-        static bool[,] poisons;
-        static bool[,] foods;
+        public static bool[,] poisons;
+        public static bool[,] foods;
         public static Cell[] cells=new Cell[64];
         public static void LoadSettings()
         {
@@ -166,11 +166,8 @@ namespace CellLab
                 {
                     point.x = x;
                     point.y = y;
-                   // if (IsPoison(point))
-                   // {
-                        DrawVoid(point);
-                        poisons[x, y] = false;
-                   // }
+                    DrawVoid(point);
+                    poisons[x, y] = false;
                 }
             }
             Random random = new Random();
@@ -227,6 +224,11 @@ namespace CellLab
                 cells[i] = new Cell(point,true,true);
                 
             }
+            /*
+            cells[0].Dispose();
+            cells[0] = new Cell(point, false, false, true);
+            *///Cоздание тестовой клеточки
+            
             GC.Collect();
         }
         public static bool IsWall(Point p)

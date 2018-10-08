@@ -42,7 +42,7 @@ namespace CellLab
 
             EnergyLabel.MouseDoubleClick += new System.Windows.Input.MouseButtonEventHandler(EnergyLabel_DoubleClick);
         }
-        public Cell(Point p, bool RandomGenome = false, bool RandomRotation = false)
+        public Cell(Point p, bool RandomGenome = false, bool RandomRotation = false, bool IsTestCell=false)
         {
             EnergyLabel = new Label();
             CellRect = new System.Windows.Shapes.Rectangle();
@@ -79,6 +79,24 @@ namespace CellLab
                 }
             }
             if (RandomRotation) Rotation = random.Next(8);
+            if (IsTestCell)
+            {
+                genome =new int[64]{53,6,10,16,23,0,3,40,
+                    0,0,29,18,40,0,0,0,
+                    18,18,40,0,0,0,0,7,
+                    40,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0};
+                Point point = new Point();
+                point.x = 4;
+                point.y = 4;
+                Position = point;
+                rotation = 0;
+                CellRect.Stroke = Brushes.Gold;
+
+            }
 
             EnergyLabel.MouseDoubleClick += new System.Windows.Input.MouseButtonEventHandler(EnergyLabel_DoubleClick);
 
@@ -275,6 +293,9 @@ namespace CellLab
             if (genome[NumAct] >= 0 && genome[NumAct] < 7) RotationAct(genome[NumAct]);
             else if (genome[NumAct] >= 7 && genome[NumAct] < 18) MoveRightAct();
             else if (genome[NumAct] >= 18 && genome[NumAct] <= 28) BiteRightAct();
+            else if (genome[NumAct] >= 29 && genome[NumAct] <= 39) NeutralizePoison();
+            else if (genome[NumAct] >= 40 && genome[NumAct] <= 51) GoTo();
+            else if (genome[NumAct] >= 52 && genome[NumAct] <= 63) GoToIf();
             else NumAct++;
         }
         private void RotationAct(int rot)
@@ -324,6 +345,34 @@ namespace CellLab
                 Energy += 25;
             }
             NumAct++;
+        }
+        private void NeutralizePoison()
+        {
+            Point point = DirRotation();
+            ActPoints=0;
+            if (Logic.IsPoison(point))
+            {
+                Logic.NowPoison--;
+                Logic.poisons[point.x, point.y] = false;
+                Logic.DrawFood(point);
+                Logic.foods[point.x, point.y] = true;
+                Logic.NowFood++;
+            }
+            NumAct++;
+        }
+        private void GoTo()
+        {
+            ActPoints--;
+            NumAct = genome[(NumAct + 1)%64];
+        }
+        private void GoToIf()
+        {
+            ActPoints--;
+            Point point = DirRotation();
+            if (Logic.IsWall(point)) NumAct = genome[(NumAct + 1)%64];
+            else if (Logic.IsPoison(point)) NumAct = genome[(NumAct + 2)%64];
+            else if (Logic.IsCell(point)) NumAct = genome[(NumAct + 3)%64];
+            else NumAct = genome[(NumAct + 4)%64];
         }
         private Point DirRotation()
         {
