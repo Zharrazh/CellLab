@@ -40,7 +40,8 @@ namespace CellLab
             random = new Random();
 
 
-            EnergyLabel.MouseDoubleClick += new System.Windows.Input.MouseButtonEventHandler(EnergyLabel_DoubleClick);
+            EnergyLabel.MouseLeftButtonDown += new System.Windows.Input.MouseButtonEventHandler(EnergyLabel_LeftClick);
+            EnergyLabel.MouseRightButtonDown += new System.Windows.Input.MouseButtonEventHandler(EnergyLabel_RightClick);
         }
         public Cell(Point p, bool RandomGenome = false, bool RandomRotation = false, bool IsTestCell=false)
         {
@@ -98,11 +99,13 @@ namespace CellLab
 
             }
 
-            EnergyLabel.MouseDoubleClick += new System.Windows.Input.MouseButtonEventHandler(EnergyLabel_DoubleClick);
+            EnergyLabel.MouseLeftButtonDown += new System.Windows.Input.MouseButtonEventHandler(EnergyLabel_LeftClick);
+            EnergyLabel.MouseRightButtonDown += new System.Windows.Input.MouseButtonEventHandler(EnergyLabel_RightClick);
 
 
         }
         bool disposed = false;
+        bool IsFavorite = false;
         InfoWin infoWin;
         public Label EnergyLabel;
         public System.Windows.Shapes.Rectangle CellRect;
@@ -245,7 +248,7 @@ namespace CellLab
             Dispose(false);
         }
 
-        private void EnergyLabel_DoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        private void EnergyLabel_LeftClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             infoWin = new InfoWin();
             infoWin.EnergyValue.Content = Energy;
@@ -260,6 +263,22 @@ namespace CellLab
             infoWin.gensLabels[NumAct].BorderBrush = Brushes.Blue;
             infoWin.Refresh.Click += RefreshBtn_Click;
             infoWin.Show();
+        }
+
+        private void EnergyLabel_RightClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (!IsFavorite)
+            {
+                CellRect.Stroke = Brushes.Gold;
+                CellRect.StrokeThickness = 2.5;
+                IsFavorite = true;
+            }
+            else
+            {
+                CellRect.Stroke = Brushes.Black;
+                CellRect.StrokeThickness = 1;
+                IsFavorite = false;
+            }
         }
 
         private void RefreshBtn_Click(object sender, System.Windows.RoutedEventArgs e)
