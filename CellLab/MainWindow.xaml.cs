@@ -36,7 +36,8 @@ namespace CellLab
             
             Logic.LoadSettings();
             Logic.LoadMap();
-            Logic.DrowMap();
+            //Logic.DrawMap();
+            Logic.RedrowMap();
         }
 
         private void SettingButton_Click(object sender, RoutedEventArgs e)
@@ -71,6 +72,7 @@ namespace CellLab
         {
             Logic.StartPoison();
             Logic.StartFood();
+            Logic.DrawWalls();
             Logic.StartGeneration();
         }
 

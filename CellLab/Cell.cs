@@ -274,6 +274,7 @@ namespace CellLab
         {
             if (genome[NumAct] >= 0 && genome[NumAct] < 7) RotationAct(genome[NumAct]);
             else if (genome[NumAct] >= 7 && genome[NumAct] < 18) MoveRightAct();
+            else if (genome[NumAct] >= 18 && genome[NumAct] <= 28) BiteRightAct();
             else NumAct++;
         }
         private void RotationAct(int rot)
@@ -299,6 +300,28 @@ namespace CellLab
             {
                 Energy += Logic.FOODNUTRIATION;
                 Logic.DeleteFood(point);
+            }
+            NumAct++;
+        }
+
+        private void BiteRightAct()
+        {
+            Point point = DirRotation();
+            ActPoints = 0;
+            if (Logic.IsFood(point))
+            {
+                Energy += Logic.FOODNUTRIATION;
+                Logic.DeleteFood(point);
+            }
+            else if (Logic.IsPoison(point))
+            {
+                IsAlive = false;
+                Logic.DeletePoison(point);
+            }
+            else if (Logic.IsCell(point))
+            {
+                Logic.WhichCell(point).Energy -= 50;
+                Energy += 25;
             }
             NumAct++;
         }

@@ -48,38 +48,11 @@ namespace CellLab
             
         }
 
-        public static void DrowMap()
-        {
-            if (MW != null)
-            {
-                MW.rectangles = new System.Windows.Shapes.Rectangle[COLUMNS, ROWS];
-                MW.Field.MinWidth = COLUMNS * SIZE;
-                MW.Field.MinHeight = ROWS * SIZE;
-                MW.Field.MaxWidth = COLUMNS * SIZE;
-                MW.Field.MaxHeight = ROWS * SIZE;
-                for (int x = 0; x < COLUMNS; x++)
-                {
-                    for (int y = 0; y < ROWS; y++)
-                    {
-                        MW.rectangles[x, y] = new System.Windows.Shapes.Rectangle();
-                        MW.Field.Children.Add(MW.rectangles[x, y]);
-                        MW.rectangles[x, y].Height = SIZE;
-                        MW.rectangles[x, y].Width = SIZE;
-                        MW.rectangles[x, y].Stroke = Brushes.Black;
-                        Canvas.SetBottom(MW.rectangles[x, y], y * SIZE);
-                        Canvas.SetLeft(MW.rectangles[x, y], x * SIZE);
-
-                    }
-                    
-                }
-                DrowWalls();
-            }
-
-        }
         public static void RedrowMap()
         {
             if (MW != null)
             {
+                if (MW.rectangles == null) MW.rectangles = new System.Windows.Shapes.Rectangle[COLUMNS, ROWS];
                 MW.Field.MinWidth = COLUMNS * SIZE;
                 MW.Field.MinHeight = ROWS * SIZE;
                 MW.Field.MaxWidth = COLUMNS * SIZE;
@@ -88,6 +61,14 @@ namespace CellLab
                 {
                     for (int y = 0; y < ROWS; y++)
                     {
+                        if (MW.rectangles[x, y] == null)
+                        {
+                            MW.rectangles[x, y] = new System.Windows.Shapes.Rectangle();
+                            MW.rectangles[x, y].Stroke = Brushes.Black;
+                            MW.rectangles[x, y].Stroke = Brushes.Black;
+                            MW.Field.Children.Add(MW.rectangles[x, y]);
+
+                        }
                         MW.rectangles[x, y].Height = SIZE;
                         MW.rectangles[x, y].Width = SIZE;
                         Canvas.SetBottom(MW.rectangles[x, y], y * SIZE);
@@ -95,10 +76,11 @@ namespace CellLab
 
                     }
                 }
-                DrowWalls();
+                
             }
+            DrawWalls();
         }
-        static void DrowWalls()
+        public static void DrawWalls()
         {
             for (int x = 0; x < COLUMNS; x++)
             {
@@ -184,15 +166,15 @@ namespace CellLab
                 {
                     point.x = x;
                     point.y = y;
-                    if (IsPoison(point))
-                    {
+                   // if (IsPoison(point))
+                   // {
                         DrawVoid(point);
                         poisons[x, y] = false;
-                    }
+                   // }
                 }
             }
             Random random = new Random();
-            while (NowPoison < FOODS)
+            while (NowPoison < POISONS)
             {
                 do
                 {
@@ -271,12 +253,24 @@ namespace CellLab
             foreach(Cell c in cells)
             {
                 if (c == null) { return false; }
-                if (c.Position.x == p.x && c.Position.y == p.y)
+                if (c.Position.x == p.x && c.Position.y == p.y&&c.IsAlive==true)
                 {
                     return true;
                 }
             }
             return false;
+        }
+        public static Cell WhichCell(Point p)
+        {
+            Cell result = null;
+            for(int i = 0; i < 64; i++)
+            {
+                if(cells[i].Position.x==p.x&& cells[i].Position.y == p.y && cells[i].IsAlive)
+                {
+                    result = cells[i];
+                }
+            }
+            return result;
         }
         public static void NextDay()
         {
