@@ -10,51 +10,66 @@ namespace CellLab
 {
     public class Cell :IDisposable
     {
-        
-        public Cell()
+        public Cell(Point p, Cell parent, bool Mutation=true)
         {
+            Logic.AliveCell++;
+
             EnergyLabel = new Label();
-            CellRect= new System.Windows.Shapes.Rectangle();
-            RectToolTip = new ToolTip();
-            infoWin = new InfoWin();
+            CellRect = new System.Windows.Shapes.Rectangle();
+
             Logic.MW.Field.Children.Add(EnergyLabel);
             Logic.MW.Field.Children.Add(CellRect);
-            
-
-            System.Windows.Controls.Canvas.SetZIndex(CellRect, 4);
-            System.Windows.Controls.Canvas.SetZIndex(EnergyLabel, 5);
+            CellRect.Fill = Brushes.Blue;
+            Canvas.SetZIndex(CellRect, 4);
+            Canvas.SetZIndex(EnergyLabel, 5);
             CellRect.Stroke = Brushes.Black;
             EnergyLabel.Foreground = Brushes.White;
-            EnergyLabel.FontFamily = new FontFamily("Times New Roman");
+            EnergyLabel.FontFamily = new FontFamily("Courier New");
             EnergyLabel.HorizontalContentAlignment = System.Windows.HorizontalAlignment.Center;
             EnergyLabel.VerticalContentAlignment = System.Windows.VerticalAlignment.Center;
+            EnergyLabel.Padding = new System.Windows.Thickness(0);
 
-            
-            genome = new int[64];
-            Position = new Point();
+            Mutations = 0;
+            genome = parent.genome;
+            if (Mutation)
+            {
+                for(int i = 0; i < 64; i++)
+                {
+                    if (Logic.random.Next(100) <= Logic.RADIATION)
+                    {
+                        genome[i] = Logic.random.Next(64);
+                        Mutations++;
+                    }
+                }
+                EnergyLabel.ToolTip = Mutations.ToString();
+            }
+            Position = p;
             Energy = 100;
             lifeTime = 0;
-            IsAlive = true;
             numAct = 0;
             ActPoints = 20;
-            random = new Random();
-
 
             EnergyLabel.MouseLeftButtonDown += new System.Windows.Input.MouseButtonEventHandler(EnergyLabel_LeftClick);
             EnergyLabel.MouseRightButtonDown += new System.Windows.Input.MouseButtonEventHandler(EnergyLabel_RightClick);
+
+
+
+
+
         }
         public Cell(Point p, bool RandomGenome = false, bool RandomRotation = false, bool IsTestCell=false)
         {
+            Logic.AliveCell++;
+
             EnergyLabel = new Label();
             CellRect = new System.Windows.Shapes.Rectangle();
-            RectToolTip = new ToolTip();
             
 
             Logic.MW.Field.Children.Add(EnergyLabel);
             Logic.MW.Field.Children.Add(CellRect);
             CellRect.Fill = Brushes.Blue;
-            System.Windows.Controls.Canvas.SetZIndex(CellRect, 4);
-            System.Windows.Controls.Canvas.SetZIndex(EnergyLabel, 5);
+            Canvas.SetZIndex(CellRect, 4);
+            Canvas.SetZIndex(EnergyLabel, 5);
             CellRect.Stroke = Brushes.Black;
             EnergyLabel.Foreground = Brushes.White;
             EnergyLabel.FontFamily = new FontFamily("Courier New");
@@ -66,7 +81,6 @@ namespace CellLab
             Position = p;
             Energy = 100;
             lifeTime = 0;
-            IsAlive = true;
             numAct = 0;
             ActPoints = 20;
             random = Logic.random;
@@ -82,17 +96,16 @@ namespace CellLab
             if (RandomRotation) Rotation = random.Next(8);
             if (IsTestCell)
             {
-                genome =new int[64]{53,6,10,16,23,0,3,40,
+                genome =new int[64]{
+                    53,6,10,16,23,0,3,40,
                     0,0,29,18,40,0,0,0,
                     18,18,40,0,0,0,0,7,
                     40,0,0,0,0,0,0,0,
-                0,0,0,0,0,0,0,0,
-                0,0,0,0,0,0,0,0,
-                0,0,0,0,0,0,0,0,
-                0,0,0,0,0,0,0,0};
-                Point point = new Point();
-                point.x = 4;
-                point.y = 4;
+                    0,0,0,0,0,0,0,0,
+                    0,0,0,0,0,0,0,0,
+                    0,0,0,0,0,0,0,0,
+                    0,0,0,0,0,0,0,0};
+                Point point = new Point {x=4,y=4 };
                 Position = point;
                 rotation = 0;
                 CellRect.Stroke = Brushes.Gold;
@@ -113,11 +126,11 @@ namespace CellLab
         public int[] genome;
         int energy;
         public int lifeTime;
-        bool isAlive;
         Point position;
         int numAct;
         int ActPoints;
         int rotation;
+        int Mutations;
         Random random;
         
 
@@ -138,38 +151,18 @@ namespace CellLab
             {
                 if (value <= 0)
                 {
-                    isAlive = false;
+                    if (energy != 0) Logic.AliveCell--;
                     energy = 0;
                     EnergyLabel.Visibility = System.Windows.Visibility.Collapsed;
                     CellRect.Visibility = System.Windows.Visibility.Collapsed;
+                    
                 }
-                else if (value >= 100) { energy = 100; isAlive = true; }
+                else if (value >= 100) { energy = 100; }
                 else
                 {
                     energy = value;
-                    isAlive = true;
                 }
                 EnergyLabel.Content = Energy;
-            }
-        }
-        public bool IsAlive
-        {
-            get { return isAlive; }
-            set
-            {
-                if (value == false)
-                {
-                    energy = 0;
-                    EnergyLabel.Visibility = System.Windows.Visibility.Collapsed;
-                    CellRect.Visibility = System.Windows.Visibility.Collapsed;
-                    isAlive = value;
-                }
-                else
-                {
-                    isAlive = value;
-                    EnergyLabel.Visibility = System.Windows.Visibility.Visible;
-                    CellRect.Visibility = System.Windows.Visibility.Visible;
-                }
             }
         }
         public Point Position
@@ -232,11 +225,13 @@ namespace CellLab
             {
                 if (disposing)
                 {
+                    if (Energy!=0) Logic.AliveCell--;
                     Logic.MW.Field.Children.Remove(EnergyLabel);
                     Logic.MW.Field.Children.Remove(CellRect);
                     EnergyLabel =null;
                     CellRect = null;
                     RectToolTip = null;
+                    
                 }
                 disposed = true;
             }
@@ -246,6 +241,14 @@ namespace CellLab
         {
 
             Dispose(false);
+        }
+        public void Refresh()
+        {
+            lifeTime = 0;
+            Energy = 100;
+            Rotation = Logic.random.Next(8);
+            CellRect.Visibility = System.Windows.Visibility.Visible;
+            EnergyLabel.Visibility = System.Windows.Visibility.Visible;
         }
 
         private void EnergyLabel_LeftClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
@@ -333,7 +336,7 @@ namespace CellLab
             }
             if (Logic.IsPoison(point))
             {
-                IsAlive = false;
+                Energy = 0;
                 Logic.DeletePoison(point);
             }
             else if (Logic.IsFood(point))
@@ -355,7 +358,7 @@ namespace CellLab
             }
             else if (Logic.IsPoison(point))
             {
-                IsAlive = false;
+                Energy = 0;
                 Logic.DeletePoison(point);
             }
             else if (Logic.IsCell(point))

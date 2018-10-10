@@ -10,11 +10,14 @@ namespace CellLab
 {
     public static class Logic
     {
+        public enum InProcess { OFF,PAYSE,RUNNING};
+        public static InProcess process = InProcess.OFF;
         public static Random random = new Random();
         static public MainWindow MW;
         static public SettingWindow SW;
         static public int POISONS, FOODS, RADIATION, FOODNUTRIATION, MAP, SIZE, ROWS, COLUMNS;
         public static int NowPoison = 0, NowFood = 0;
+        public static int AliveCell = 0, Day=0,Era=0,MaxLifeTime=0;
         static bool[,] walls;
         public static bool[,] poisons;
         public static bool[,] foods;
@@ -63,9 +66,7 @@ namespace CellLab
                     {
                         if (MW.rectangles[x, y] == null)
                         {
-                            MW.rectangles[x, y] = new System.Windows.Shapes.Rectangle();
-                            MW.rectangles[x, y].Stroke = Brushes.Black;
-                            MW.rectangles[x, y].Stroke = Brushes.Black;
+                            MW.rectangles[x, y] = new System.Windows.Shapes.Rectangle { Stroke=Brushes.Black};
                             MW.Field.Children.Add(MW.rectangles[x, y]);
 
                         }
@@ -224,8 +225,8 @@ namespace CellLab
                 cells[i] = new Cell(point,true,true);
                 
             }
-            /*
-            cells[0].Dispose();
+            
+            /*cells[0].Dispose();
             cells[0] = new Cell(point, false, false, true);
             *///Cоздание тестовой клеточки
             
@@ -255,7 +256,7 @@ namespace CellLab
             foreach(Cell c in cells)
             {
                 if (c == null) { return false; }
-                if (c.Position.x == p.x && c.Position.y == p.y&&c.IsAlive==true)
+                if (c.Position.x == p.x && c.Position.y == p.y&&c.Energy>0)
                 {
                     return true;
                 }
@@ -267,7 +268,7 @@ namespace CellLab
             Cell result = null;
             for(int i = 0; i < 64; i++)
             {
-                if(cells[i].Position.x==p.x&& cells[i].Position.y == p.y && cells[i].IsAlive)
+                if(cells[i].Position.x==p.x&& cells[i].Position.y == p.y && cells[i].Energy>0)
                 {
                     result = cells[i];
                 }
@@ -280,7 +281,7 @@ namespace CellLab
             NewPoison();
             for(int i = 0; i < 64; i++)
             {
-                if (cells[i].IsAlive)
+                if (cells[i].Energy>0)
                 {
                     cells[i].NextAct();
                 }
@@ -298,6 +299,62 @@ namespace CellLab
             NowFood--;
             foods[p.x, p.y] = false;
             DrawVoid(p);
+        }
+        public static void NewGeneration()
+        {
+            //Пузырьковая сортировка по времени жизни
+                for (int i = 0; i < 8; i++)
+                { 
+                    for (int j = 63; j > i; j--)
+                    { 
+                        if (cells[j].lifeTime > cells[j - 1].lifeTime)
+                        {
+                            Cell tmp = cells[j];
+                            cells[j] = cells[j - 1];
+                            cells[j - 1] = tmp;
+                        }
+                    }
+                }
+                //Если установлен рекор по времени жизни
+            if (MaxLifeTime < cells[0].lifeTime)
+            {
+                MaxLifeTime = cells[0].lifeTime;
+                MW.MaxLifeTime.Content = "MaxLifeTime: " + MaxLifeTime.ToString();
+            }
+                //Составление новой популяции
+            for(int i = 0; i < 64; i++)
+            {
+                cells[i].Energy = 0;
+            }
+            for(int i = 8; i < 64; i++)
+            {
+                cells[i].Dispose();
+            }
+            Point point = new Point();
+            for(int i = 0; i < 8; i++)
+            {
+                for(int g = 1; g < 8; g++)
+                {
+                    do
+                    {
+                        point.x = random.Next(COLUMNS);
+                        point.y = random.Next(ROWS);
+                    }
+                    while (IsWall(point) || IsPoison(point) || IsFood(point) || IsCell(point));
+
+                    cells[i + 8 * g] = new Cell(point,cells[i]);
+                }
+                do
+                {
+                    point.x = random.Next(COLUMNS);
+                    point.y = random.Next(ROWS);
+                }
+                while (IsWall(point) || IsPoison(point) || IsFood(point) || IsCell(point));
+                cells[i].Position = point;
+                cells[i].Refresh();
+                AliveCell++;
+            }
+
         }
 
 

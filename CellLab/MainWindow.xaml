@@ -5,15 +5,19 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CellLab"
         mc:Ignorable="d"
-        Title="CellLab" Height="450" Width="800" Closed="Window_Closed" WindowStartupLocation="CenterScreen" WindowState="Maximized">
+        Title="CellLab" Height="500" Width="800" Closed="Window_Closed" WindowStartupLocation="CenterScreen" WindowState="Maximized">
     <Grid Background="WhiteSmoke">
         <DockPanel>
             <StackPanel DockPanel.Dock="Right" Orientation="Vertical">
                 <Button Content="Start" Margin="10" Width="50" Height="50" Name="StartBtn" Click="StartBtn_Click"/>
-                <Button Content="Pause" Margin="10" Width="50" Height="50" Name="PauseBtn"/>
+                <Button Content="Pause" Margin="10" Width="50" Height="50" Name="PauseBtn" Click="PauseBtn_Click"/>
                 <Button Content="Next" Margin="10" Width="50" Height="50" Name="NextBtn" Click="NextBtn_Click"/>
                 <Button Content="Stop" Margin="10" Width="50" Height="50" Name="StapBtn"/>
                 <Button Content="Settings" Margin="10" Width="50" Height="50" Click="SettingButton_Click" />
+                <Label Content="Day:" Name="Day" HorizontalAlignment="Center"/>
+                <Label Content="Era:" Name="Era" HorizontalAlignment="Center"/>
+                <Label Content="MaxLifeTime: " Name="MaxLifeTime" HorizontalAlignment="Center"/>
+                <Button Content="Chart" Margin="10" Width="50" Height="50" Name="ChartBtn" Click="ChartBtn_Click"/>
             </StackPanel>
             <Slider Orientation="Horizontal" Width="100" Height="20" Minimum="1" Maximum="100" TickFrequency="1" IsSnapToTickEnabled="True" DockPanel.Dock="Bottom" Margin="30,10,5,10" HorizontalAlignment="Left" x:Name="SizeSlider" Value="20" ValueChanged="SizeSlider_ValueChanged"/>
             <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
